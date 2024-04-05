@@ -1,3 +1,13 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "max-len": [
+      "error",
+      {
+        "code": 80,
+        "ignoreStrings": true,
+        "tabWidth": 2
+      }
+    ]
+  }
 }
