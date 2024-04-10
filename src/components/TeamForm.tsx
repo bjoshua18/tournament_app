@@ -1,25 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import axios from 'axios';
 import TeamFormInput from './TeamFormInput';
-
-// TODO: Remove and use typeorm entity
-type Player = {
-  name: string;
-  lastname: string;
-  phone: string;
-  email: string;
-  shirtSize: string;
-  availability: string;
-}
-type Team = {
-  category: string;
-  player1: Player;
-  player2: Player;
-}
+import {TeamRequest} from '@/schemas';
+import {useRouter} from "next/navigation";
 
 export default function TeamForm() {
-  const [teamData, setTeamData] = useState<Team>({
+  const [teamData, setTeamData] = useState<TeamRequest>({
     category: '',
     player1: {
       name: '',
@@ -38,19 +26,21 @@ export default function TeamForm() {
       availability: ''
     }
   });
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSelectChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
     fieldName: string,
     player?: 'player1' | 'player2'
   ) => {
-    const { value } = event.target;
+    const {value} = event.target;
 
     if (!player) {
       if (fieldName === 'category') {
         setTeamData({
-        ...teamData,
-        [fieldName]: value
+          ...teamData,
+          [fieldName]: value
         });
       }
       return;
@@ -66,35 +56,33 @@ export default function TeamForm() {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, player: 'player1' | 'player2') => {
-    const { name, value } = event.target;
-    setTeamData({ 
-      ...teamData, 
-      [player]: { 
-        ...teamData[player], 
-        [name]: value 
-      } 
+    const {name, value} = event.target;
+    setTeamData({
+      ...teamData,
+      [player]: {
+        ...teamData[player],
+        [name]: value
+      }
     });
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log(teamData);
-    // TODO: Send teamData to the server
-    // fetch('/ruta-de-envio', {
-    //   method: 'POST',
-    //   body: JSON.stringify(teamData),
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   }
-    // })
-    // .then(response => {
-    //   if (response.ok) {
-    //     // Procesar la respuesta
-    //   } else {
-    //     throw new Error('Error al enviar el formulario');
-    //   }
-    // })
-    // .catch(error => console.error('Error:', error));
+    try {
+      const team = await axios({
+        method: 'POST',
+        url: '/api/teams',
+        data: teamData,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('RESPONSE', team);
+      router.push('/teams');
+    } catch (error) {
+      setError('Error al enviar el formulario. Por favor, inténtalo de nuevo.');
+    }
   }
 
   return (
@@ -174,14 +162,15 @@ export default function TeamForm() {
             <option value="m">M</option>
             <option value="l">L</option>
             <option value="xl">XL</option>
+            <option value="xxl">XXL</option>
           </select>
-          <textarea 
-            id="availability1" 
-            name="availability" 
-            placeholder="Disponibilidad - Ej: Lunes y martes por la tarde, jueves por la mañana" 
-            value={teamData.player1.availability} 
-            onChange={e => handleInputChange(e, 'player1')} 
-            className="my-4 p-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm md:text-base" 
+          <textarea
+            id="availability1"
+            name="availability"
+            placeholder="Disponibilidad - Ej: Lunes y martes por la tarde, jueves por la mañana"
+            value={teamData.player1.availability}
+            onChange={e => handleInputChange(e, 'player1')}
+            className="my-4 p-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm md:text-base"
             required
           />
         </div>
@@ -190,48 +179,48 @@ export default function TeamForm() {
 
         <div className="my-4">
           <h3 className="text-lg md:text-xl font-medium mb-1">Jugador/a 2</h3>
-          <TeamFormInput 
-            type="text" 
-            id="name2" 
-            name="name" 
-            value={teamData.player2.name} 
-            onChange={e => handleInputChange(e, 'player2')} 
+          <TeamFormInput
+            type="text"
+            id="name2"
+            name="name"
+            value={teamData.player2.name}
+            onChange={e => handleInputChange(e, 'player2')}
             placeholder="Nombre"
             required
           />
-          <TeamFormInput 
-            type="text" 
-            id="lastname2" 
-            name="lastname" 
-            value={teamData.player2.lastname} 
-            onChange={e => handleInputChange(e, 'player2')} 
+          <TeamFormInput
+            type="text"
+            id="lastname2"
+            name="lastname"
+            value={teamData.player2.lastname}
+            onChange={e => handleInputChange(e, 'player2')}
             placeholder="Apellido"
             required
           />
-          <TeamFormInput 
-            type="tel" 
-            id="phone2" 
-            name="phone" 
-            value={teamData.player2.phone} 
-            onChange={e => handleInputChange(e, 'player2')} 
+          <TeamFormInput
+            type="tel"
+            id="phone2"
+            name="phone"
+            value={teamData.player2.phone}
+            onChange={e => handleInputChange(e, 'player2')}
             placeholder="Teléfono"
             required
           />
-          <TeamFormInput 
-            type="email" 
-            id="email2" 
-            name="email" 
-            value={teamData.player2.email} 
-            onChange={e => handleInputChange(e, 'player2')} 
+          <TeamFormInput
+            type="email"
+            id="email2"
+            name="email"
+            value={teamData.player2.email}
+            onChange={e => handleInputChange(e, 'player2')}
             placeholder="Correo electrónico"
             required
           />
-          <select 
-            id="shirtSize2" 
-            name="shirtSize" 
-            value={teamData.player2.shirtSize} 
-            onChange={e => handleSelectChange(e, 'shirtSize', 'player2')} 
-            className="my-4 p-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm md:text-base" 
+          <select
+            id="shirtSize2"
+            name="shirtSize"
+            value={teamData.player2.shirtSize}
+            onChange={e => handleSelectChange(e, 'shirtSize', 'player2')}
+            className="my-4 p-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm md:text-base"
             required
           >
             <option value="" disabled hidden>Talla de camiseta</option>
@@ -239,21 +228,23 @@ export default function TeamForm() {
             <option value="m">M</option>
             <option value="l">L</option>
             <option value="xl">XL</option>
+            <option value="xxl">XXL</option>
           </select>
-          <textarea 
-            id="availability2" 
-            name="availability" 
-            placeholder="Disponibilidad - Ej: Lunes y martes por la tarde, jueves por la mañana" 
-            value={teamData.player2.availability} 
-            onChange={e => handleInputChange(e, 'player2')} 
-            className="my-4 p-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm md:text-base" 
+          <textarea
+            id="availability2"
+            name="availability"
+            placeholder="Disponibilidad - Ej: Lunes y martes por la tarde, jueves por la mañana"
+            value={teamData.player2.availability}
+            onChange={e => handleInputChange(e, 'player2')}
+            className="my-4 p-2 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm md:text-base"
             required
           />
         </div>
       </div>
 
       <div className="flex justify-center">
-        <button type="submit" className="w-full sm:w-48 md:w-64 my-4 py-4 px-4 rounded bg-brandPrimary hover:bg-brandSecondary text-white font-semibold">
+        <button type="submit"
+                className="w-full sm:w-48 md:w-64 my-4 py-4 px-4 rounded bg-brandPrimary hover:bg-brandSecondary text-white font-semibold">
           Enviar
         </button>
       </div>
