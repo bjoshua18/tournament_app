@@ -4,7 +4,7 @@ export async function fetchTeamsByCategory() {
   try {
     const {data: {data}} = await axios({
       method: 'GET',
-      url: 'http://localhost:3000/api/teams',
+      url: `${process.env.API_URL}/teams`,
       headers: {
         'Content-Type': 'application/json'
       },
