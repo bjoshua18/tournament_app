@@ -10,7 +10,7 @@ import {
 import {Player} from "@/entity/Player";
 import {TeamCategory} from "@/enums";
 
-@Entity()
+@Entity('team')
 export class Team extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

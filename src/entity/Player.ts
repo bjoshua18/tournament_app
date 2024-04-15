@@ -11,7 +11,7 @@ import {
 import {Team} from "@/entity/Team";
 import {ShirtSize} from "@/enums";
 
-@Entity()
+@Entity('player')
 @Unique(['email'])
 export class Player extends BaseEntity {
   @PrimaryGeneratedColumn()
