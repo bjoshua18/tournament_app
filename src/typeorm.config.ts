@@ -11,6 +11,7 @@ const config: DataSourceOptions = {
   database: process.env.DB_NAME,
   logging: true,
   entities: [Player, Team],
+  synchronize: true
 };
 
 export default config;
